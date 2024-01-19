@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import RestartButton from "./components/RestartButton";
+import Results from "./components/Results";
+import UserTypings from "./components/UserTypings";
+import useEngine from "./hooks/useEngine";
+import { calculateAccuracyPercentage } from "./utils/helpers";
 
-function App() {
+const App = () => {
+  const { words, typed, timeLeft, errors, state, restart, totalTyped } = useEngine();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+      <CountdownTimer timeLeft={timeLeft} />
+      <WordsContainer>
+        <GeneratedWords key={words} words={words} />
+        <UserTypings className="absolute inset-0" words={words} userInput={typed} />
+      </WordsContainer>
+      <RestartButton 
+        className={"mx-auto mt-10 text-slate-500"}
+        onRestart={restart}
+      />
+      <Results 
+        state={state}
+        className="mt-10"
+        errors={errors}
+        accuracyPercentage={calculateAccuracyPercentage(errors, totalTyped)}
+        total={totalTyped}
+      />
+    </>
+  )
+}
+
+const WordsContainer = ({ children }: {children: React.ReactNode }) => {
+  return (
+    <div className="relative text-3xl max-w-xl leading-relaxed break-all mt-3">
+      {children}
     </div>
-  );
+  )
+}
+
+const GeneratedWords = ({ words }: { words: string }) => {
+  return <div className="text-slate-500">{words}</div>
+}
+
+const CountdownTimer = ({ timeLeft }: { timeLeft: number }) => {
+  return <h2 className="text-primary-400 font-medium">Time: {timeLeft}</h2>
 }
 
 export default App;
